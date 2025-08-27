@@ -55,15 +55,17 @@ process_log() {
         last_offset=0
     fi
 
-    # Если offset равен текущему размеру — новых строк нет
+    # Если offset равен текущему размеру — новых данных нет
     if (( last_offset >= filesize )); then
         return
     fi
 
-    # Читаем новые строки и шлём
-    tail -c +$((last_offset+1)) "$log_file" | while IFS= read -r line; do
-        [[ -n "$line" ]] && send_to_url "$(basename "$log_file")" "$line"
-    done
+    # Читаем весь новый фрагмент сразу
+    local new_data
+    new_data=$(tail -c +$((last_offset+1)) "$log_file")
+
+    # Отправляем целиком
+    [[ -n "$new_data" ]] && send_to_url "$(basename "$log_file")" "$new_data"
 
     # Запоминаем новую позицию
     write_offset "$log_file" "$filesize"
