@@ -23,8 +23,8 @@ read -p "Введите POST_URL (например https://example.com/logs): " 
 read -p "Введите CHECK_INTERVAL [по умолчанию 600]: " CHECK_INTERVAL
 CHECK_INTERVAL=${CHECK_INTERVAL:-600}
 
-read -p "Введите LOG_FILES [по умолчанию /var/log/syslog /var/log/auth.log]: " LOG_FILES
-LOG_FILES=${LOG_FILES:-"/var/log/syslog /var/log/auth.log"}
+read -p "Введите LOG_FILES [по умолчанию /var/log/httpd/*error_log /var/log/mysql/error.log /var/log/nginx/*error_log /var/log/php/exceptions.log]: " LOG_FILES
+LOG_FILES=${LOG_FILES:-"/var/log/httpd/*error_log /var/log/mysql/error.log /var/log/nginx/*error_log /var/log/php/exceptions.log"}
 
 read -p "Введите OFFSET_DIR [по умолчанию /var/tmp/log2message]: " OFFSET_DIR
 OFFSET_DIR=${OFFSET_DIR:-"/var/tmp/log2message"}

@@ -62,8 +62,21 @@ process_log() {
 
 # === Основной цикл ===
 while true; do
-    for log in $LOG_FILES; do
-        process_log "$log"
+    # Разворачиваем шаблоны в массив файлов
+    LOG_FILES_ARRAY=()
+    for pattern in $LOG_FILES; do
+        files=( $pattern )
+        if [[ ${#files[@]} -eq 0 ]]; then
+            echo "[WARN] Нет файлов для шаблона: $pattern"
+        else
+            LOG_FILES_ARRAY+=( "${files[@]}" )
+        fi
     done
+
+    # Обрабатываем каждый найденный файл
+    for log_file in "${LOG_FILES_ARRAY[@]}"; do
+        process_log "$log_file"
+    done
+
     sleep "$CHECK_INTERVAL"
 done
