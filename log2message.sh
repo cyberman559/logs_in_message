@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Загружаем конфиг
-CONFIG_FILE="/etc/log2http.conf"
+CONFIG_FILE="/etc/log2message.conf"
 if [[ ! -f "$CONFIG_FILE" ]]; then
     echo "[ERROR] Config file not found: $CONFIG_FILE"
     exit 1
@@ -25,7 +25,11 @@ read_offset() {
     if [[ -f "$ofs_file" ]]; then
         cat "$ofs_file"
     else
-        echo 0
+        # Offset-файла нет — ставим текущий размер файла
+        local filesize=$(stat -c%s "$log_file" 2>/dev/null || echo 0)
+        echo "$filesize" > "$ofs_file"
+        # Возвращаем размер, чтобы process_log понял, что новые строки пока отсутствуют
+        echo "$filesize"
     fi
 }
 
@@ -49,6 +53,11 @@ process_log() {
     # Если logrotate обрезал файл
     if (( filesize < last_offset )); then
         last_offset=0
+    fi
+
+    # Если offset равен текущему размеру — новых строк нет
+    if (( last_offset >= filesize )); then
+        return
     fi
 
     # Читаем новые строки и шлём
